@@ -284,7 +284,7 @@
                     const index = slotData.index;
                     this.y = this.maxY - index * this.slotHeight;
                 } else {
-                    console.log('cannot find value', this.value, this.slots);
+                    console.log('cannot find value', this.value);
                 }
             },
         },

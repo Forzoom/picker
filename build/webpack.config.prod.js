@@ -7,8 +7,8 @@ module.exports = {
 	entry: './src/index.js',
 	output: {
 		path: path.resolve(__dirname, '../dist'),
-		filename: 'nav.min.js',
-		library: 'nav',
+		filename: 'picker.min.js',
+		library: 'picker',
 		libraryTarget: 'umd',
 	},
 	resolve: {

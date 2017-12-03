@@ -21,8 +21,11 @@
         getMonthDay,
     } from './lib/utils.js';
     import Picker from './picker.vue';
+
     /**
      * 日期选择
+     *
+     * @input 数据更新
      */
     export default {
         name: 'DatePicker',
