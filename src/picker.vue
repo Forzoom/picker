@@ -164,18 +164,21 @@
              */
             onTouchStart() {
                 this.inTouchMove = true;
+                console.log('onTouchStart');
             },
             /**
              * 移动
              */
             onTouchMove({ y, }) {
                 this.y = this.range(this.y + y);
+                console.log('onTouchMove');
             },
             /**
              * 结束
              */
             onTouchEnd() {
                 this.inTouchMove = false;
+                console.log('onTouchEnd');
             },
             /**
              * touch-fling事件相关的处理函数
@@ -183,6 +186,7 @@
              * @param {} speedX
              */
             onTouchFling({ speedY, }) {
+                console.log('onTouchFling');
                 const vm = this;
                 const height = vm.slotHeight;
                 let distance = speedY * speedY / 2 / vm.accelerate;
@@ -213,6 +217,7 @@
              * 处理slide事件
              */
             onTouchSlide() {
+                console.log('onTouchSlide');
                 // 移动到slot的位置
                 // 计算slot的位置
                 const vm = this;

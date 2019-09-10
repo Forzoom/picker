@@ -1,5 +1,3 @@
-import querystring from 'querystring';
-
 const ch = [ null, '一', '二', '三', '四', '五', '六', '七', '八', '九', ];
 
 const chWeekDay = [ '日', '一', '二', '三', '四', '五', '六', '日', ];
@@ -71,16 +69,6 @@ export function placeholder(val, placeholder, extra) {
         return placeholder;
     }
     return val;
-}
-
-/**
- * 获得querystring
- *
- * @return {object} 返回qs
- */
-export function getQS() {
-    const posInSearch = location.search.indexOf('?');
-    return querystring.decode(location.search.substr(posInSearch + 1));
 }
 
 /**
