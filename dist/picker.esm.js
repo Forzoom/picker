@@ -578,6 +578,8 @@ var script = {
    * 锚定
    */
   mounted: function mounted() {
+    var _this = this;
+
     var defaultRect = {
       top: 0,
       left: 0,
@@ -585,14 +587,17 @@ var script = {
       height: 0
     }; // 容器大小
 
-    var containerRect = this.$refs.container.getBoundingClientRect && this.$refs.container.getBoundingClientRect() || defaultRect;
-    this.containerRect = {
-      left: containerRect.left,
-      top: containerRect.top,
-      width: containerRect.width,
-      height: containerRect.height
-    };
-    this.updatePosition();
+    setTimeout(function () {
+      var containerRect = _this.$refs.container.getBoundingClientRect && _this.$refs.container.getBoundingClientRect() || defaultRect;
+      _this.containerRect = {
+        left: containerRect.left,
+        top: containerRect.top,
+        width: containerRect.width,
+        height: containerRect.height
+      };
+
+      _this.updatePosition();
+    }, 100);
   }
 };
 
@@ -795,7 +800,7 @@ __vue_render__._withStripped = true;
   /* style */
   const __vue_inject_styles__ = function (inject) {
     if (!inject) return
-    inject("data-v-85e704f4_0", { source: ".picker-container {\n  position: relative;\n  height: 4.6875rem;\n  overflow: hidden;\n}\n.picker-display {\n  position: absolute;\n  top: 1.875rem;\n  width: 100%;\n  height: 0.9375rem;\n  font-size: 0.5625rem;\n  background-color: rgba(0, 0, 0, 0.1);\n}\n.picker-slot {\n  height: 0.9375rem;\n  font-size: 0.5625rem;\n  line-height: 0.9375rem;\n  text-align: center;\n}\n", map: {"version":3,"sources":["picker.vue"],"names":[],"mappings":"AAAA;EACE,kBAAkB;EAClB,iBAAiB;EACjB,gBAAgB;AAClB;AACA;EACE,kBAAkB;EAClB,aAAa;EACb,WAAW;EACX,iBAAiB;EACjB,oBAAoB;EACpB,oCAAoC;AACtC;AACA;EACE,iBAAiB;EACjB,oBAAoB;EACpB,sBAAsB;EACtB,kBAAkB;AACpB","file":"picker.vue","sourcesContent":[".picker-container {\n  position: relative;\n  height: 4.6875rem;\n  overflow: hidden;\n}\n.picker-display {\n  position: absolute;\n  top: 1.875rem;\n  width: 100%;\n  height: 0.9375rem;\n  font-size: 0.5625rem;\n  background-color: rgba(0, 0, 0, 0.1);\n}\n.picker-slot {\n  height: 0.9375rem;\n  font-size: 0.5625rem;\n  line-height: 0.9375rem;\n  text-align: center;\n}\n"]}, media: undefined });
+    inject("data-v-63d70154_0", { source: ".picker-container {\n  position: relative;\n  height: 4.6875rem;\n  overflow: hidden;\n}\n.picker-display {\n  position: absolute;\n  top: 1.875rem;\n  width: 100%;\n  height: 0.9375rem;\n  font-size: 0.5625rem;\n  background-color: rgba(0, 0, 0, 0.1);\n}\n.picker-slot {\n  height: 0.9375rem;\n  font-size: 0.5625rem;\n  line-height: 0.9375rem;\n  text-align: center;\n}\n", map: {"version":3,"sources":["picker.vue"],"names":[],"mappings":"AAAA;EACE,kBAAkB;EAClB,iBAAiB;EACjB,gBAAgB;AAClB;AACA;EACE,kBAAkB;EAClB,aAAa;EACb,WAAW;EACX,iBAAiB;EACjB,oBAAoB;EACpB,oCAAoC;AACtC;AACA;EACE,iBAAiB;EACjB,oBAAoB;EACpB,sBAAsB;EACtB,kBAAkB;AACpB","file":"picker.vue","sourcesContent":[".picker-container {\n  position: relative;\n  height: 4.6875rem;\n  overflow: hidden;\n}\n.picker-display {\n  position: absolute;\n  top: 1.875rem;\n  width: 100%;\n  height: 0.9375rem;\n  font-size: 0.5625rem;\n  background-color: rgba(0, 0, 0, 0.1);\n}\n.picker-slot {\n  height: 0.9375rem;\n  font-size: 0.5625rem;\n  line-height: 0.9375rem;\n  text-align: center;\n}\n"]}, media: undefined });
 
   };
   /* scoped */

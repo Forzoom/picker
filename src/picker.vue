@@ -304,15 +304,17 @@
                 height: 0,
             };
             // 容器大小
-            const containerRect = (this.$refs.container.getBoundingClientRect && this.$refs.container.getBoundingClientRect()) || defaultRect;
-            this.containerRect = {
-                left: containerRect.left,
-                top: containerRect.top,
-                width: containerRect.width,
-                height: containerRect.height,
-            };
+            setTimeout(() => {
+                const containerRect = (this.$refs.container.getBoundingClientRect && this.$refs.container.getBoundingClientRect()) || defaultRect;
+                this.containerRect = {
+                    left: containerRect.left,
+                    top: containerRect.top,
+                    width: containerRect.width,
+                    height: containerRect.height,
+                };
 
-            this.updatePosition();
+                this.updatePosition();
+            }, 100);
         },
     };
 </script>
