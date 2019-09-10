@@ -18,12 +18,11 @@
     "url": "https://github.com/Forzoom/picker/issues"
   },
   "homepage": "https://github.com/Forzoom/picker#readme",
-  "dependencies": {
-    "@forzoom/touch": "github:Forzoom/touch#29ba486e186cc5dce91a3a8c4888e34a863be848"
-  },
+  "dependencies": {},
   "devDependencies": {
     "@babel/core": "^7.6.0",
     "@babel/preset-env": "^7.6.0",
+    "@forzoom/touch": "0.0.11",
     "less": "^2.7.2",
     "rollup": "^1.21.2",
     "rollup-plugin-babel": "^4.3.3",

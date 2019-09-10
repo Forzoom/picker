@@ -2,349 +2,277 @@
 
 Object.defineProperty(exports, '__esModule', { value: true });
 
-var noop = function noop() {};
+var commonjsGlobal = typeof globalThis !== 'undefined' ? globalThis : typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : typeof self !== 'undefined' ? self : {};
 
-var AXIS_X = 1;
-var AXIS_Y = 2;
-var supportTouchEvent = 'ontouchstart' in window;
-/**
- * 事件
- * touch-down(startPos, currentPos)
- * touch-move(x, y)
- * touch-slide(startPos, currentPost)
- * touch-fling
- * touch-up(startPos, currentPos)
- */
+function unwrapExports (x) {
+	return x && x.__esModule && Object.prototype.hasOwnProperty.call(x, 'default') ? x['default'] : x;
+}
 
-var TouchHub =
-/** @class */
-function () {
-  /**
-   * onTouchDown
-   * onTouchUp
-   * onTouchMove
-   * onTouchSlide
-   * onTouchFling
-   */
-  function TouchHub() {
-    var self = this; // 是否停止检测
+function createCommonjsModule(fn, module) {
+	return module = { exports: {} }, fn(module, module.exports), module.exports;
+}
 
-    self.active = true;
-    self.speedX = [0, 0]; // 速度记录
-
-    self.speedXIdx = 0;
-    self.speedY = [0, 0];
-    self.speedYIdx = 0;
-    self.minFlingSpeed = 1; // px/millsecond
-
-    self.maxFlingSpeed = 1; // 当前主要检测的轴向
-
-    self.coordinate = 'x';
-    self.moveCoordinate = null;
-    /* 主要依赖：CSSOM/gBCR */
-    // 所有的状态
-
-    self.startPos = {
-      x: 0,
-      y: 0
-    }; // touch开始的位置，对应的pageX,pageY
-
-    self.currentPos = {
-      x: 0,
-      y: 0
-    }; // 每次touchMove的情况下，对应的pageX/pageY都是currentPos
-
-    self.lastRecordTime = -1, // 上次数据记录时间
-    self._down = self._up = self._move = self._slide = self._fling = noop; // 输出
-
-    if (supportTouchEvent) {
-      console.log('[touch] support touch event');
-    } else {
-      console.log('[touch] fallback to mouse event');
-    }
-  }
-
-  TouchHub.prototype.start = function (event) {
-    console.log('start');
-    var self = this;
-
-    if (!self.active) {
-      return;
-    }
-
-    var e = null;
-
-    if (supportTouchEvent) {
-      e = event.changedTouches[0];
-    } else {
-      e = event;
-      self.mouseStatus = 1;
-    } // 获得当前的位置数据
-
-
-    var x = e.clientX;
-    var y = e.clientY;
-
-    self._setStartPosition(x, y);
-
-    self._setCurrentPosition(x, y); // 发生点击的开始
-    // 分别创建两个不同
-
-
-    self._down({
-      startPos: Object.assign({}, self.startPos),
-      currentPos: Object.assign({}, self.currentPos)
-    });
-
-    self.lastRecordTime = Date.now();
-  };
-
-  TouchHub.prototype.move = function (event) {
-    console.log('move');
-    var self = this;
-
-    if (!self.active) {
-      return;
-    }
-
-    var e = null;
-
-    if (supportTouchEvent) {
-      e = event.touches[0];
-    } else {
-      e = event;
-
-      if (self.mouseStatus != 1) {
-        return;
+var touch_min = createCommonjsModule(function (module, exports) {
+  !function (e, t) {
+     module.exports = t() ;
+  }(commonjsGlobal, function () {
+    return function (e) {
+      function t(n) {
+        if (o[n]) return o[n].exports;
+        var r = o[n] = {
+          i: n,
+          l: !1,
+          exports: {}
+        };
+        return e[n].call(r.exports, r, r.exports, t), r.l = !0, r.exports;
       }
-    }
 
-    var pageX = e.clientX;
-    var pageY = e.clientY;
-    var offsetX = pageX - self.currentPos.x;
-    var offsetY = pageY - self.currentPos.y;
+      var o = {};
+      return t.m = e, t.c = o, t.i = function (e) {
+        return e;
+      }, t.d = function (e, o, n) {
+        t.o(e, o) || Object.defineProperty(e, o, {
+          configurable: !1,
+          enumerable: !0,
+          get: n
+        });
+      }, t.n = function (e) {
+        var o = e && e.__esModule ? function () {
+          return e["default"];
+        } : function () {
+          return e;
+        };
+        return t.d(o, "a", o), o;
+      }, t.o = function (e, t) {
+        return Object.prototype.hasOwnProperty.call(e, t);
+      }, t.p = "", t(t.s = 2);
+    }([function (e, t, o) {
 
-    self._setCurrentPosition(pageX, pageY);
-
-    var moveCoordinate = Math.abs(offsetX) > Math.abs(offsetY) ? 'x' : 'y';
-
-    if (!self.moveCoordinate) {
-      self.moveCoordinate = moveCoordinate;
-    }
-
-    self._move({
-      x: offsetX,
-      y: offsetY,
-      startMoveCoordinate: self.moveCoordinate,
-      moveCoordinate: moveCoordinate
-    });
-
-    var now = Date.now();
-    self.recordSpeed(offsetX, AXIS_X, now);
-    self.recordSpeed(offsetY, AXIS_Y, now);
-    self.lastRecordTime = now; // preventDefault，是为了阻止后面元素的滚动
-
-    if (self.moveCoordinate == self.coordinate) {
-      event.preventDefault();
-    }
-  };
-
-  TouchHub.prototype.end = function (event) {
-    console.log('end');
-    var self = this;
-
-    if (!self.active) {
-      return;
-    }
-
-    var e = null;
-
-    if (supportTouchEvent) {
-      e = event.changedTouches[0];
-    } else {
-      e = event;
-      self.mouseStatus = 0;
-    } // var pageX = touch.clientX;
-    // var pageY = touch.clientY;
-    // var offsetX = pageX - self.currentPos.x;
-    // var offsetY = pageY - self.currentPos.y; // 为了触发touch.move
-
-
-    self._setCurrentPosition(e.clientX, e.clientY);
-
-    var speedX = (self.speedX[0] + self.speedX[1]) / 2;
-    var speedY = (self.speedY[0] + self.speedY[1]) / 2;
-
-    self._up({
-      startPos: Object.assign({}, self.startPos),
-      currentPos: Object.assign({}, self.currentPos)
-    });
-
-    if (self.coordinate === 'x' ? Math.abs(speedX) > self.minFlingSpeed : Math.abs(speedY) > self.minFlingSpeed) {
-      self._fling({
-        startPos: Object.assign({}, self.startPos),
-        currentPos: Object.assign({}, self.currentPos),
-        speedX: speedX,
-        speedY: speedY
+      Object.defineProperty(t, "__esModule", {
+        value: !0
       });
-    } else if (self.coordinate === 'x' ? Math.abs(self.currentPos.x - self.startPos.x) > 0 : Math.abs(self.currentPos.y - self.startPos.y) > 0) {
-      self._slide({
-        startPos: Object.assign({}, self.startPos),
-        currentPos: Object.assign({}, self.currentPos)
+      var n = o(1);
+      t["default"] = {
+        name: "ROTouch",
+        props: {
+          coordinate: {
+            type: String,
+            "default": "x"
+          }
+        },
+        data: function data() {
+          return {
+            hub: new n.TouchHub()
+          };
+        },
+        created: function created() {
+          var e = this;
+          e.hub.onTouchDown(function (t) {
+            return e.$emit("touch-down", t);
+          }), e.hub.onTouchUp(function (t) {
+            return e.$emit("touch-up", t);
+          }), e.hub.onTouchMove(function (t) {
+            return e.$emit("touch-move", t);
+          }), e.hub.onTouchSlide(function (t) {
+            return e.$emit("touch-slide", t);
+          }), e.hub.onTouchFling(function (t) {
+            return e.$emit("touch-fling", t);
+          });
+        },
+        mounted: function mounted() {
+          this.hub.coordinate = this.coordinate;
+        },
+        render: function render(e) {
+          var t = this,
+              o = {
+            "class": ["ro-touch"],
+            style: {
+              width: "100%",
+              height: "100%"
+            },
+            on: {}
+          };
+          return n.supportTouchEvent ? (o.on.touchstart = t.hub.start.bind(t.hub), o.on.touchmove = t.hub.move.bind(t.hub), o.on.touchend = t.hub.end.bind(t.hub)) : (o.on.mousedown = t.hub.start.bind(t.hub), o.on.mousemove = t.hub.move.bind(t.hub), o.on.mouseup = t.hub.end.bind(t.hub)), e("div", o, this.$slots["default"]);
+        }
+      };
+    }, function (e, t, o) {
+
+      function n(e, t) {
+        if (!(e instanceof t)) throw new TypeError("Cannot call a class as a function");
+      }
+
+      Object.defineProperty(t, "__esModule", {
+        value: !0
       });
-    } // clearSpeed
 
+      var r = Object.assign || function (e) {
+        for (var t = 1; t < arguments.length; t++) {
+          var o = arguments[t];
 
-    self.speedX[0] = self.speedX[1] = 0;
-    self.speedY[0] = self.speedY[1] = 0; //
+          for (var n in o) {
+            Object.prototype.hasOwnProperty.call(o, n) && (e[n] = o[n]);
+          }
+        }
 
-    self.moveCoordinate = null;
-  };
-
-  TouchHub.prototype.recordSpeed = function (offset, axis, now) {
-    var self = this;
-    var duration = now - self.lastRecordTime;
-    var speed = offset / duration; // 记录数据
-
-    if (axis === AXIS_X) {
-      self.speedX[self.speedXIdx++ & 1] = speed; // 让speedIdx保存为0或者1的情况
-    } else if (axis === AXIS_Y) {
-      self.speedY[self.speedYIdx++ & 1] = speed; // 让speedIdx保存为0或者1的情况
-    }
-  };
-
-  TouchHub.prototype.work = function (active) {
-    this.active = active;
-  };
-
-  TouchHub.prototype._setStartPosition = function (x, y) {
-    this.startPos.x = x;
-    this.startPos.y = y;
-  };
-  /**
-   *
-   */
-
-
-  TouchHub.prototype._setCurrentPosition = function (x, y) {
-    this.currentPos.x = x;
-    this.currentPos.y = y;
-  };
-
-  TouchHub.prototype.onTouchDown = function (cb) {
-    this._down = cb;
-  };
-
-  TouchHub.prototype.onTouchUp = function (cb) {
-    this._up = cb;
-  };
-
-  TouchHub.prototype.onTouchMove = function (cb) {
-    this._move = cb;
-  };
-
-  TouchHub.prototype.onTouchSlide = function (cb) {
-    this._slide = cb;
-  };
-
-  TouchHub.prototype.onTouchFling = function (cb) {
-    this._fling = cb;
-  };
-
-  return TouchHub;
-}();
-/**
- * 事件
- * touch-down(startPos, currentPos)
- * touch-move(x, y)
- * touch-slide(startPos, currentPost)
- * touch-fling
- * touch-up(startPos, currentPos)
- */
-
-
-var Touch = {
-  name: 'ROTouch',
-  props: {
-    /**
-     * 当前正在处理的coordinate
-     */
-    coordinate: {
-      type: String,
-      "default": 'x'
-    },
-
-    /**
-     * 是否active
-     */
-    active: {
-      type: Boolean,
-      "default": true
-    }
-  },
-  data: function data() {
-    return {
-      hub: new TouchHub()
-    };
-  },
-  watch: {
-    /**
-     * 检查active
-     */
-    active: function active(val) {
-      this.hub.active = val;
-    }
-  },
-  created: function created() {
-    var vm = this;
-    vm.hub.onTouchDown(function (res) {
-      return vm.$emit('touch-down', res);
-    });
-    vm.hub.onTouchUp(function (res) {
-      return vm.$emit('touch-up', res);
-    });
-    vm.hub.onTouchMove(function (res) {
-      return vm.$emit('touch-move', res);
-    });
-    vm.hub.onTouchSlide(function (res) {
-      return vm.$emit('touch-slide', res);
-    });
-    vm.hub.onTouchFling(function (res) {
-      return vm.$emit('touch-fling', res);
-    });
-  },
-  mounted: function mounted() {
-    this.hub.coordinate = this.coordinate;
-    this.hub.active = this.active;
-  },
-  render: function render(h) {
-    var vm = this;
-    var el = document.createElement('div'); // el.style
-
-    var v = {
-      'class': ['ro-touch'],
-      style: {
-        width: '100%',
-        height: '100%'
+        return e;
       },
-      on: {}
-    };
+          u = function () {
+        function e(e, t) {
+          for (var o = 0; o < t.length; o++) {
+            var n = t[o];
+            n.enumerable = n.enumerable || !1, n.configurable = !0, "value" in n && (n.writable = !0), Object.defineProperty(e, n.key, n);
+          }
+        }
 
-    if (supportTouchEvent) {
-      v.on['!touchstart'] = vm.hub.start.bind(vm.hub);
-      v.on.touchmove = vm.hub.move.bind(vm.hub);
-      v.on.touchend = vm.hub.end.bind(vm.hub);
-      v.style.backgroundColor = '#f00';
-    } else {
-      v.on.mousedown = vm.hub.start.bind(vm.hub);
-      v.on.mousemove = vm.hub.move.bind(vm.hub);
-      v.on.mouseup = vm.hub.end.bind(vm.hub);
-      v.style.backgroundColor = '#0f0';
-    }
+        return function (t, o, n) {
+          return o && e(t.prototype, o), n && e(t, n), t;
+        };
+      }(),
+          i = function i() {},
+          s = t.supportTouchEvent = "ontouchstart" in window;
 
-    return h('div', v, this.$slots["default"]);
-  }
-};
+      t.TouchHub = function () {
+        function e() {
+          n(this, e);
+          var t = this;
+          t.active = !0, t.speedX = [0, 0], t.speedXIdx = 0, t.speedY = [0, 0], t.speedYIdx = 0, t.minFlingSpeed = 1, t.maxFlingSpeed = 1, t.coordinate = "x", t.moveCoordinate = null, t.startPos = {
+            x: 0,
+            y: 0
+          }, t.currentPos = {
+            x: 0,
+            y: 0
+          }, t.lastRecordTime = -1, t._down = t._up = t._move = t._slide = t._fling = i, s ? console.log("[touch] support touch event") : console.log("[touch] fallback to mouse event");
+        }
+
+        return u(e, [{
+          key: "start",
+          value: function value(e) {
+            var t = this;
+
+            if (t.active) {
+              var o = null;
+              s ? o = e.changedTouches[0] : (o = e, t.mouseStatus = 1);
+              var n = o.clientX,
+                  u = o.clientY;
+              t._setStartPosition(n, u), t._setCurrentPosition(n, u), t._down({
+                startPos: r({}, t.startPos),
+                currentPos: r({}, t.currentPos)
+              }), t.lastRecordTime = Date.now();
+            }
+          }
+        }, {
+          key: "move",
+          value: function value(e) {
+            var t = this;
+
+            if (t.active) {
+              var o = null;
+              if (s) o = e.touches[0];else if (o = e, 1 != t.mouseStatus) return;
+              var n = o.clientX,
+                  r = o.clientY,
+                  u = n - t.currentPos.x,
+                  i = r - t.currentPos.y;
+
+              t._setCurrentPosition(n, r);
+
+              var c = Math.abs(u) > Math.abs(i) ? "x" : "y";
+              t.moveCoordinate || (t.moveCoordinate = c), t._move({
+                x: u,
+                y: i,
+                startMoveCoordinate: t.moveCoordinate,
+                moveCoordinate: c
+              });
+              var a = Date.now();
+              t.recordSpeed(u, 1, a), t.recordSpeed(i, 2, a), t.lastRecordTime = a, t.moveCoordinate == t.coordinate && e.preventDefault();
+            }
+          }
+        }, {
+          key: "end",
+          value: function value(e) {
+            var t = this;
+
+            if (t.active) {
+              var o = null;
+              s ? o = e.changedTouches[0] : (o = e, t.mouseStatus = 0), t._setCurrentPosition(o.clientX, o.clientY);
+              var n = (t.speedX[0] + t.speedX[1]) / 2,
+                  u = (t.speedY[0] + t.speedY[1]) / 2;
+              t._up({
+                startPos: r({}, t.startPos),
+                currentPos: r({}, t.currentPos)
+              }), ("x" === t.coordinate ? Math.abs(n) > t.minFlingSpeed : Math.abs(u) > t.minFlingSpeed) ? t._fling({
+                startPos: r({}, t.startPos),
+                currentPos: r({}, t.currentPos),
+                speedX: n,
+                speedY: u
+              }) : ("x" === t.coordinate ? Math.abs(t.currentPos.x - t.startPos.x) > 0 : Math.abs(t.currentPos.y - t.startPos.y) > 0) && t._slide({
+                startPos: r({}, t.startPos),
+                currentPos: r({}, t.currentPos)
+              }), t.speedX[0] = t.speedX[1] = 0, t.speedY[0] = t.speedY[1] = 0, t.moveCoordinate = null;
+            }
+          }
+        }, {
+          key: "recordSpeed",
+          value: function value(e, t, o) {
+            var n = this,
+                r = o - n.lastRecordTime,
+                u = e / r;
+            1 === t ? n.speedX[1 & n.speedXIdx++] = u : 2 === t && (n.speedY[1 & n.speedYIdx++] = u);
+          }
+        }, {
+          key: "work",
+          value: function value(e) {
+            this.active = e;
+          }
+        }, {
+          key: "_setStartPosition",
+          value: function value(e, t) {
+            this.startPos.x = e, this.startPos.y = t;
+          }
+        }, {
+          key: "_setCurrentPosition",
+          value: function value(e, t) {
+            this.currentPos.x = e, this.currentPos.y = t;
+          }
+        }, {
+          key: "onTouchDown",
+          value: function value(e) {
+            this._down = e;
+          }
+        }, {
+          key: "onTouchUp",
+          value: function value(e) {
+            this._up = e;
+          }
+        }, {
+          key: "onTouchMove",
+          value: function value(e) {
+            this._move = e;
+          }
+        }, {
+          key: "onTouchSlide",
+          value: function value(e) {
+            this._slide = e;
+          }
+        }, {
+          key: "onTouchFling",
+          value: function value(e) {
+            this._fling = e;
+          }
+        }]), e;
+      }();
+    }, function (e, t, o) {
+
+      Object.defineProperty(t, "__esModule", {
+        value: !0
+      });
+      var n = o(0),
+          r = o.n(n);
+      t["default"] = r.a;
+    }]);
+  });
+});
+var Touch = unwrapExports(touch_min);
+var touch_min_1 = touch_min.touch;
 
 //
 /**
